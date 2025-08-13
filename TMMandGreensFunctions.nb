@@ -1,0 +1,1006 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[     38139,        998]
+NotebookOptionsPosition[     36681,        971]
+NotebookOutlinePosition[     37078,        987]
+CellTagsIndexPosition[     37035,        984]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"--", 
+      RowBox[{"-", "1."}]}], " ", "Define", " ", "Materials", " ", "and", " ",
+      "Dispersive", " ", "Refractive", " ", 
+     RowBox[{"Indices", "--"}]}], "-"}], "*)"}], 
+  RowBox[{"(*", 
+   RowBox[{
+   "Using", " ", "Sellmeier", " ", "equations", " ", "or", " ", 
+    "interpolated", " ", "data", " ", "for", " ", "realistic", " ", 
+    "models"}], "*)"}], 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"n", 
+     RowBox[{"(", "lambda", ")"}]}], "=", 
+    RowBox[{"sqrt", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"1", "+", 
+        RowBox[{"B1", "*", 
+         RowBox[{
+          RowBox[{"lambda", "^", "2"}], "/", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"lambda", "^", "2"}], "-", "C1"}], ")"}]}]}], "+"}], 
+       "..."}], ")"}]}]}], "*)"}], 
+  RowBox[{"(*", 
+   RowBox[{
+   "k", " ", "is", " ", "the", " ", "extinction", " ", "coefficient"}], 
+   "*)"}], 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"nGlass", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"Sqrt", "[", 
+      RowBox[{"1", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1.03961212", "*", 
+          RowBox[{"lambda", "^", "2"}]}], ")"}], "/", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"lambda", "^", "2"}], "-", "0.00600069867"}], ")"}]}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"0.231792344", "*", 
+          RowBox[{"lambda", "^", "2"}]}], ")"}], "/", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"lambda", "^", "2"}], "-", "0.0200179144"}], ")"}]}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1.01046945", "*", 
+          RowBox[{"lambda", "^", "2"}]}], ")"}], "/", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"lambda", "^", "2"}], "-", "103.560653"}], ")"}]}]}], 
+      "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kGlass", "[", "lambda_", "]"}], ":=", "0"}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Data", " ", "for", " ", "ITO"}], ",", "Al", ",", 
+     RowBox[{
+     "and", " ", "organics", " ", "would", " ", "be", " ", "imported", " ", 
+      "from", " ", "literature", " ", "data", " ", "files"}]}], "*)"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"For", " ", "this", " ", "example"}], ",", 
+     RowBox[{
+      RowBox[{"we", "'"}], "ll", " ", "use", " ", "simplified", " ", "but", " ",
+       "dispersive", " ", "models"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nITO", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"1.8", "+", 
+      RowBox[{"20000", "/", 
+       RowBox[{"lambda", "^", "2"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kITO", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"0.05", "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"(", 
+          RowBox[{"lambda", "-", "400"}], ")"}]}], "/", "100"}], "]"}]}]}], 
+    ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nNPB", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"1.75", "+", 
+      RowBox[{"15000", "/", 
+       RowBox[{"lambda", "^", "2"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kNPB", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"0.01", "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"(", 
+          RowBox[{"lambda", "-", "380"}], ")"}]}], "/", "50"}], "]"}]}]}], 
+    ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nCBP", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"1.7", "+", 
+      RowBox[{"18000", "/", 
+       RowBox[{"lambda", "^", "2"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kCBP", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"0.01", "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"(", 
+          RowBox[{"lambda", "-", "370"}], ")"}]}], "/", "40"}], "]"}]}]}], 
+    ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nTPBi", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"1.72", "+", 
+      RowBox[{"16000", "/", 
+       RowBox[{"lambda", "^", "2"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kTPBi", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"0.01", "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"(", 
+          RowBox[{"lambda", "-", "360"}], ")"}]}], "/", "45"}], "]"}]}]}], 
+    ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nLiF", "[", "lambda_", "]"}], ":=", "1.39"}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kLiF", "[", "lambda_", "]"}], ":=", "0"}], ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"nAl", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"0.9", "+", 
+      RowBox[{"0.1", "*", 
+       RowBox[{"(", 
+        RowBox[{"lambda", "/", "550"}], ")"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"kAl", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"7.0", "-", 
+      RowBox[{"1.0", "*", 
+       RowBox[{"(", 
+        RowBox[{"lambda", "/", "550"}], ")"}]}]}]}], ";"}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"materials", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"\"\<Glass\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nGlass", ",", "kGlass"}], "}"}]}], ",", 
+       RowBox[{"\"\<ITO\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nITO", ",", "kITO"}], "}"}]}], ",", 
+       RowBox[{"\"\<NPB\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nNPB", ",", "kNPB"}], "}"}]}], ",", 
+       RowBox[{"\"\<CBP\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nCBP", ",", "kCBP"}], "}"}]}], ",", 
+       RowBox[{"\"\<TPBi\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nTPBi", ",", "kTPBi"}], "}"}]}], ",", 
+       RowBox[{"\"\<LiF\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nLiF", ",", "kLiF"}], "}"}]}], ",", 
+       RowBox[{"\"\<Al\>\"", "->", 
+        RowBox[{"{", 
+         RowBox[{"nAl", ",", "kAl"}], "}"}]}]}], "}"}]}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.9629592490624256`*^9, 3.9629592509511833`*^9}, {
+  3.9629593794181385`*^9, 3.9629593800853977`*^9}},
+ CellLabel->
+  "In[243]:=",ExpressionUUID->"fce0d0d2-9770-6d4b-bc2f-7bac8693326e"],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"--", 
+        RowBox[{"-", "2."}]}], " ", "Implement", " ", "Transfer", " ", 
+       "Matrix", " ", "Method", " ", 
+       RowBox[{"(", "TMM", ")"}]}], "&"}], " ", 
+     RowBox[{"Green", "'"}], "s", " ", 
+     RowBox[{"Function", "--"}]}], "-"}], "*)"}], "\[IndentingNewLine]", "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+   "Function", " ", "to", " ", "calculate", " ", "reflection", " ", 
+    "coefficient", " ", "for", " ", "a", " ", "multilayer", " ", "stack"}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"GetReflection", "[", 
+     RowBox[{"pol_String", ",", 
+      RowBox[{"lambda_", "?", "NumericQ"}], ",", 
+      RowBox[{"theta_", "?", "NumericQ"}], ",", "thicknesses_List"}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "nList", ",", "dList", ",", "k0", ",", "kx", ",", "kz", ",", "M", ",", 
+        "r"}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"nList", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"#", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], "[", "lambda", "]"}], "+", 
+            RowBox[{"I", " ", 
+             RowBox[{
+              RowBox[{"#", "[", 
+               RowBox[{"[", "2", "]"}], "]"}], "[", "lambda", "]"}]}]}], 
+           ")"}], "&"}], "/@", 
+         RowBox[{"Values", "[", "materials", "]"}]}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"dList", "=", 
+        RowBox[{"Prepend", "[", 
+         RowBox[{"thicknesses", ",", "Infinity"}], "]"}]}], ";", 
+       RowBox[{"(*", 
+        RowBox[{"Add", " ", "substrate"}], "*)"}], 
+       RowBox[{"k0", "=", 
+        RowBox[{"2", " ", 
+         RowBox[{"Pi", "/", "lambda"}]}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"kx", "=", 
+        RowBox[{
+         RowBox[{"nList", "[", 
+          RowBox[{"[", "1", "]"}], "]"}], "*", "k0", "*", 
+         RowBox[{"Sin", "[", "theta", "]"}]}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"kz", "=", 
+        RowBox[{"Sqrt", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"nList", "^", "2"}], "*", 
+           RowBox[{"k0", "^", "2"}]}], "-", 
+          RowBox[{"kx", "^", "2"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"(*", "Admittance", "*)"}], 
+       RowBox[{
+        RowBox[{"gamma", "[", "j_", "]"}], ":=", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"pol", "==", "\"\<s\>\""}], ",", 
+          RowBox[{
+           RowBox[{"kz", "[", 
+            RowBox[{"[", "j", "]"}], "]"}], "/", 
+           RowBox[{"(", "k0", ")"}]}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"nList", "[", 
+             RowBox[{"[", "j", "]"}], "]"}], "^", "2"}], "*", 
+           RowBox[{"k0", "/", 
+            RowBox[{"kz", "[", 
+             RowBox[{"[", "j", "]"}], "]"}]}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+        "Transfer", " ", "Matrix", " ", "for", " ", "a", " ", "single", " ", 
+         "layer"}], "*)"}], 
+       RowBox[{
+        RowBox[{"layerMatrix", "[", "j_", "]"}], ":=", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"Cos", "[", 
+             RowBox[{
+              RowBox[{"kz", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], " ", 
+              RowBox[{"dList", "[", 
+               RowBox[{"[", "j", "]"}], "]"}]}], "]"}], ",", 
+            RowBox[{
+             RowBox[{"I", "/", 
+              RowBox[{"gamma", "[", "j", "]"}]}], " ", 
+             RowBox[{"Sin", "[", 
+              RowBox[{
+               RowBox[{"kz", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], " ", 
+               RowBox[{"dList", "[", 
+                RowBox[{"[", "j", "]"}], "]"}]}], "]"}]}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"I", " ", 
+             RowBox[{"gamma", "[", "j", "]"}], " ", 
+             RowBox[{"Sin", "[", 
+              RowBox[{
+               RowBox[{"kz", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], " ", 
+               RowBox[{"dList", "[", 
+                RowBox[{"[", "j", "]"}], "]"}]}], "]"}]}], ",", 
+            RowBox[{"Cos", "[", 
+             RowBox[{
+              RowBox[{"kz", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], " ", 
+              RowBox[{"dList", "[", 
+               RowBox[{"[", "j", "]"}], "]"}]}], "]"}]}], "}"}]}], "}"}]}], ";",
+        "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{
+         "Total", " ", "Matrix", " ", "for", " ", "stack", " ", "from", " ", 
+          "layer", " ", "2", " ", "to", " ", "N"}], "-", "1"}], "*)"}], 
+       RowBox[{"M", "=", 
+        RowBox[{"Fold", "[", 
+         RowBox[{"Dot", ",", 
+          RowBox[{"IdentityMatrix", "[", "2", "]"}], ",", 
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"layerMatrix", "[", "j", "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"j", ",", "2", ",", 
+              RowBox[{
+               RowBox[{"Length", "[", "nList", "]"}], "-", "1"}]}], "}"}]}], 
+           "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{"Calculate", " ", "reflection", " ", "coefficient"}], "*)"}], 
+       RowBox[{"r", "=", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"M", "[", 
+               RowBox[{"[", 
+                RowBox[{"1", ",", "1"}], "]"}], "]"}], "+", 
+              RowBox[{
+               RowBox[{"M", "[", 
+                RowBox[{"[", 
+                 RowBox[{"1", ",", "2"}], "]"}], "]"}], " ", 
+               RowBox[{"gamma", "[", 
+                RowBox[{"Length", "[", "nList", "]"}], "]"}]}]}], ")"}], " ", 
+            RowBox[{"gamma", "[", "1", "]"}]}], "-", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"M", "[", 
+              RowBox[{"[", 
+               RowBox[{"2", ",", "1"}], "]"}], "]"}], "+", 
+             RowBox[{
+              RowBox[{"M", "[", 
+               RowBox[{"[", 
+                RowBox[{"2", ",", "2"}], "]"}], "]"}], " ", 
+              RowBox[{"gamma", "[", 
+               RowBox[{"Length", "[", "nList", "]"}], "]"}]}]}], ")"}]}], 
+          ")"}], "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"M", "[", 
+               RowBox[{"[", 
+                RowBox[{"1", ",", "1"}], "]"}], "]"}], "+", 
+              RowBox[{
+               RowBox[{"M", "[", 
+                RowBox[{"[", 
+                 RowBox[{"1", ",", "2"}], "]"}], "]"}], " ", 
+               RowBox[{"gamma", "[", 
+                RowBox[{"Length", "[", "nList", "]"}], "]"}]}]}], ")"}], " ", 
+            RowBox[{"gamma", "[", "1", "]"}]}], "+", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"M", "[", 
+              RowBox[{"[", 
+               RowBox[{"2", ",", "1"}], "]"}], "]"}], "+", 
+             RowBox[{
+              RowBox[{"M", "[", 
+               RowBox[{"[", 
+                RowBox[{"2", ",", "2"}], "]"}], "]"}], " ", 
+              RowBox[{"gamma", "[", 
+               RowBox[{"Length", "[", "nList", "]"}], "]"}]}]}], ")"}]}], 
+          ")"}]}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Abs", "[", "r", "]"}], "^", "2"}]}]}], "]"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.962959466926529*^9, 3.96295946938278*^9}},
+ CellLabel->
+  "In[258]:=",ExpressionUUID->"1864c96f-a1a6-5a45-a8b9-a603fc71efce"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Simplified", " ", 
+    RowBox[{"Green", "'"}], "s", " ", "function", " ", 
+    RowBox[{"model", ":", 
+     RowBox[{
+      RowBox[{"Power", " ", "is", " ", "proportional", " ", "to", " ", "1"}], 
+      "-", "R"}]}]}], "*)"}], "\n", 
+  RowBox[{"(*", 
+   RowBox[{"This", " ", "is", " ", "an", " ", 
+    RowBox[{"approximation", ".", "A"}], " ", "full", " ", "model", " ", "is",
+     " ", "significantly", " ", "more", " ", 
+    RowBox[{"complex", "."}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+   "We", " ", "calculate", " ", "power", " ", "radiated", " ", "into", " ", 
+    "the", " ", "substrate", " ", 
+    RowBox[{"vs", ".", "lost"}], " ", "to", " ", "the", " ", "metal"}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"CalculatePowerDistribution", "[", 
+     RowBox[{
+      RowBox[{"lambda_", "?", "NumericQ"}], ",", "thicknesses_List"}], "]"}], 
+    ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"thetaCrit", ",", "pRad", ",", "pLoss"}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"thetaCrit", "=", 
+        RowBox[{"ArcSin", "[", 
+         RowBox[{"1.0", "/", 
+          RowBox[{"nGlass", "[", "lambda", "]"}]}], "]"}]}], ";", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Air", "/", "Glass"}], " ", "interface"}], "*)"}], 
+       RowBox[{"(*", 
+        RowBox[{"Radiated", " ", 
+         RowBox[{"Power", ":", 
+          RowBox[{
+          "Integrated", " ", "over", " ", "the", " ", "escape", " ", 
+           "cone"}]}]}], "*)"}], 
+       RowBox[{"pRad", "=", 
+        RowBox[{"NIntegrate", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"1", "-", 
+             RowBox[{"GetReflection", "[", 
+              
+              RowBox[{"\"\<s\>\"", ",", "lambda", ",", "theta", ",", 
+               "thicknesses"}], "]"}]}], ")"}], "+", 
+           RowBox[{"(", 
+            RowBox[{"1", "-", 
+             RowBox[{"GetReflection", "[", 
+              
+              RowBox[{"\"\<p\>\"", ",", "lambda", ",", "theta", ",", 
+               "thicknesses"}], "]"}]}], ")"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"theta", ",", "0", ",", "thetaCrit"}], "}"}]}], "]"}]}], ";",
+        "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{"Lost", " ", 
+         RowBox[{"Power", ":", 
+          RowBox[{"Waveguided", " ", "and", " ", "SPP", " ", "modes", " ", 
+           RowBox[{"(", "approximated", ")"}]}]}]}], "*)"}], 
+       RowBox[{"pLoss", "=", 
+        RowBox[{"NIntegrate", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"GetReflection", "[", 
+             
+             RowBox[{"\"\<s\>\"", ",", "lambda", ",", "theta", ",", 
+              "thicknesses"}], "]"}], ")"}], "+", 
+           RowBox[{"(", 
+            RowBox[{"GetReflection", "[", 
+             
+             RowBox[{"\"\<p\>\"", ",", "lambda", ",", "theta", ",", 
+              "thicknesses"}], "]"}], ")"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"theta", ",", "thetaCrit", ",", 
+            RowBox[{"Pi", "/", "2"}]}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{"pRad", ",", "pLoss"}], "}"}]}]}], "]"}]}], ";"}]}]], "Input",
+ CellChangeTimes->{{3.9629594843523254`*^9, 3.9629594860550423`*^9}},
+ CellLabel->
+  "In[259]:=",ExpressionUUID->"7d298e1a-1749-254f-ae37-defc3d98a460"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Outcoupling", " ", "efficiency", " ", "at", " ", "a", " ", "given", " ", 
+    "wavelength"}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"etaOut", "[", 
+     RowBox[{
+      RowBox[{"lambda_", "?", "NumericQ"}], ",", "thicknesses_List"}], "]"}], 
+    ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"powers", "=", 
+        RowBox[{"CalculatePowerDistribution", "[", 
+         RowBox[{"lambda", ",", "thicknesses"}], "]"}]}], "}"}], ",", 
+      RowBox[{
+       RowBox[{"powers", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "/", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"powers", "[", 
+          RowBox[{"[", "1", "]"}], "]"}], "+", 
+         RowBox[{"powers", "[", 
+          RowBox[{"[", "2", "]"}], "]"}]}], ")"}]}]}], "]"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.9629595017853413`*^9, 3.962959502399946*^9}},
+ CellLabel->
+  "In[260]:=",ExpressionUUID->"2975fcb6-bb8e-cb40-9985-3e1dd57fd0f3"],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"--", 
+        RowBox[{"-", "3."}]}], " ", "Define", " ", "Optimization", " ", 
+       "Goals"}], "&"}], " ", "Objective", " ", 
+     RowBox[{"Function", "--"}]}], "-"}], "*)"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"Emitter", "'"}], "s", " ", "intrinsic", " ", "spectrum"}], 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"emissionSpectrum", "[", "lambda_", "]"}], ":=", 
+     RowBox[{"Exp", "[", 
+      RowBox[{"-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"lambda", "-", "550"}], ")"}], "/", "100"}], ")"}], "^", 
+        "2"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Memoize", " ", "for", " ", "speed", " ", "during", " ", "optimization"}],
+     "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"etaOutMemo", "=", 
+     RowBox[{"Memoize", "[", "etaOut", "]"}]}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.9629595081726303`*^9, 3.9629595091165504`*^9}},
+ CellLabel->
+  "In[261]:=",ExpressionUUID->"55f9b0f1-1a41-d143-8dac-1302616fd32a"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"Goal", " ", "1"}], ":", 
+    RowBox[{"Overall", " ", "Outcoupling", " ", "Efficiency"}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"OverallEfficiency", "[", 
+      RowBox[{"thicknesses_", "?", "VectorQ"}], "]"}], ":=", 
+     RowBox[{
+      RowBox[{"NIntegrate", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"etaOutMemo", "[", 
+          RowBox[{"lambda", ",", "thicknesses"}], "]"}], "*", 
+         RowBox[{"emissionSpectrum", "[", "lambda", "]"}]}], ",", 
+        RowBox[{"{", 
+         RowBox[{"lambda", ",", "400", ",", "700"}], "}"}], ",", 
+        RowBox[{"Method", "->", "\"\<LocalAdaptive\>\""}]}], "]"}], "/", 
+      RowBox[{"NIntegrate", "[", 
+       RowBox[{
+        RowBox[{"emissionSpectrum", "[", "lambda", "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"lambda", ",", "400", ",", "700"}], "}"}]}], "]"}]}]}], 
+    ";"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Goal", " ", "2"}], ":", 
+     RowBox[{"Outcoupling", " ", "Uniformity"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Uniformity", "[", 
+      RowBox[{"thicknesses_", "?", "VectorQ"}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"etaValues", ",", "mean", ",", "stddev"}], "}"}], ",", 
+       RowBox[{
+        RowBox[{"etaValues", "=", 
+         RowBox[{"Table", "[", 
+          RowBox[{
+           RowBox[{"etaOutMemo", "[", 
+            RowBox[{"lambda", ",", "thicknesses"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"lambda", ",", "450", ",", "650", ",", "20"}], "}"}]}], 
+          "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"mean", "=", 
+         RowBox[{"Mean", "[", "etaValues", "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"stddev", "=", 
+         RowBox[{"StandardDeviation", "[", "etaValues", "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"mean", "==", "0"}], ",", "0", ",", 
+          RowBox[{"1", "-", 
+           RowBox[{"stddev", "/", "mean"}]}]}], "]"}]}]}], "]"}]}], 
+    ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.9629595243684654`*^9, 3.9629595248588314`*^9}},
+ CellLabel->
+  "In[263]:=",ExpressionUUID->"0e6fc832-3730-6a4e-8fae-423706958fe8"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Combined", " ", "Objective", " ", "Function"}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"ObjectiveFunction", "[", 
+     RowBox[{
+      RowBox[{"d_ito", 
+       RowBox[{"_", "?", "NumericQ"}]}], ",", 
+      RowBox[{"d_npb", 
+       RowBox[{"_", "?", "NumericQ"}]}], ",", 
+      RowBox[{"d_cbp", 
+       RowBox[{"_", "?", "NumericQ"}]}], ",", 
+      RowBox[{"d_tpbi", 
+       RowBox[{"_", "?", "NumericQ"}]}], ",", 
+      RowBox[{"d_lif", 
+       RowBox[{"_", "?", "NumericQ"}]}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"thicknesses", "=", 
+        RowBox[{"{", 
+         RowBox[{
+         "d_ito", ",", "d_npb", ",", "d_cbp", ",", "d_tpbi", ",", "d_lif", ",",
+           "Infinity"}], "}"}]}], "}"}], ",", 
+      RowBox[{"(*", 
+       RowBox[{"Weights", " ", "for", " ", "each", " ", "objective"}], "*)"}], 
+      RowBox[{
+       RowBox[{"wEfficiency", "=", "0.7"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"wUniformity", "=", "0.3"}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"wEfficiency", "*", 
+         RowBox[{"OverallEfficiency", "[", "thicknesses", "]"}]}], "+", 
+        RowBox[{"wUniformity", "*", 
+         RowBox[{"Uniformity", "[", "thicknesses", "]"}]}]}]}]}], "]"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.962959532320284*^9, 3.962959533029747*^9}},
+ CellLabel->
+  "In[265]:=",ExpressionUUID->"cdbe05a5-fc25-3c47-acb4-e0e610f04076"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "RuleDelayed", "rhs", 
+   "\"Pattern \\!\\(\\*RowBox[{\\\"d_ito\\\"}]\\) appears on the right-hand \
+side of rule \\!\\(\\*RowBox[{RowBox[{\\\"ObjectiveFunction\\\", \\\"[\\\", \
+RowBox[{RowBox[{\\\"d_ito\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \
+\\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_npb\\\", \\\" \\\", RowBox[{\\\
+\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_cbp\\\", \
+\\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", \
+RowBox[{\\\"d_tpbi\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\
+\\\"}]}], \\\",\\\", RowBox[{\\\"d_lif\\\", \\\" \\\", RowBox[{\\\"_\\\", \
+\\\"?\\\", \\\"NumericQ\\\"}]}]}], \\\"]\\\"}], \\\"\[RuleDelayed]\\\", \
+RowBox[{\\\"Module\\\", \\\"[\\\", RowBox[{RowBox[{\\\"{\\\", \
+RowBox[{\\\"thicknesses\\\", \\\"=\\\", RowBox[{\\\"{\\\", \
+RowBox[{\\\"d_ito\\\", \\\",\\\", \\\"d_npb\\\", \\\",\\\", \\\"d_cbp\\\", \\\
+\",\\\", \\\"d_tpbi\\\", \\\",\\\", \\\"d_lif\\\", \\\",\\\", \\\"\[Infinity]\
+\\\"}], \\\"}\\\"}]}], \\\"}\\\"}], \\\",\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\"=\\\", \\\"0.7`\\\"}], \\\";\\\", \
+RowBox[{\\\"wUniformity\\\", \\\"=\\\", \\\"0.3`\\\"}], \\\";\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\" \\\", RowBox[{\\\"OverallEfficiency\
+\\\", \\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}], \\\"+\\\", \
+RowBox[{\\\"wUniformity\\\", \\\" \\\", RowBox[{\\\"Uniformity\\\", \
+\\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}]}]}]}], \\\"]\\\"}]}]\\).\"", 2, 
+   265, 35, 17792161530042188262, "Local"},
+  "MessageTemplate",
+  BaseStyle->"MSG"]], "Message",
+ CellChangeTimes->{3.9629595334324226`*^9},
+ CellLabel->
+  "During evaluation of \
+In[265]:=",ExpressionUUID->"bb5efb18-e0e3-844f-9703-524f057f30d7"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "RuleDelayed", "rhs", 
+   "\"Pattern \\!\\(\\*RowBox[{\\\"d_npb\\\"}]\\) appears on the right-hand \
+side of rule \\!\\(\\*RowBox[{RowBox[{\\\"ObjectiveFunction\\\", \\\"[\\\", \
+RowBox[{RowBox[{\\\"d_ito\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \
+\\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_npb\\\", \\\" \\\", RowBox[{\\\
+\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_cbp\\\", \
+\\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", \
+RowBox[{\\\"d_tpbi\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\
+\\\"}]}], \\\",\\\", RowBox[{\\\"d_lif\\\", \\\" \\\", RowBox[{\\\"_\\\", \
+\\\"?\\\", \\\"NumericQ\\\"}]}]}], \\\"]\\\"}], \\\"\[RuleDelayed]\\\", \
+RowBox[{\\\"Module\\\", \\\"[\\\", RowBox[{RowBox[{\\\"{\\\", \
+RowBox[{\\\"thicknesses\\\", \\\"=\\\", RowBox[{\\\"{\\\", \
+RowBox[{\\\"d_ito\\\", \\\",\\\", \\\"d_npb\\\", \\\",\\\", \\\"d_cbp\\\", \\\
+\",\\\", \\\"d_tpbi\\\", \\\",\\\", \\\"d_lif\\\", \\\",\\\", \\\"\[Infinity]\
+\\\"}], \\\"}\\\"}]}], \\\"}\\\"}], \\\",\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\"=\\\", \\\"0.7`\\\"}], \\\";\\\", \
+RowBox[{\\\"wUniformity\\\", \\\"=\\\", \\\"0.3`\\\"}], \\\";\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\" \\\", RowBox[{\\\"OverallEfficiency\
+\\\", \\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}], \\\"+\\\", \
+RowBox[{\\\"wUniformity\\\", \\\" \\\", RowBox[{\\\"Uniformity\\\", \
+\\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}]}]}]}], \\\"]\\\"}]}]\\).\"", 2, 
+   265, 36, 17792161530042188262, "Local"},
+  "MessageTemplate",
+  BaseStyle->"MSG"]], "Message",
+ CellChangeTimes->{3.9629595334409065`*^9},
+ CellLabel->
+  "During evaluation of \
+In[265]:=",ExpressionUUID->"c46bc604-3a8f-7745-856b-f5c38e2f3bb8"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "RuleDelayed", "rhs", 
+   "\"Pattern \\!\\(\\*RowBox[{\\\"d_cbp\\\"}]\\) appears on the right-hand \
+side of rule \\!\\(\\*RowBox[{RowBox[{\\\"ObjectiveFunction\\\", \\\"[\\\", \
+RowBox[{RowBox[{\\\"d_ito\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \
+\\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_npb\\\", \\\" \\\", RowBox[{\\\
+\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", RowBox[{\\\"d_cbp\\\", \
+\\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\\\"}]}], \\\",\\\", \
+RowBox[{\\\"d_tpbi\\\", \\\" \\\", RowBox[{\\\"_\\\", \\\"?\\\", \\\"NumericQ\
+\\\"}]}], \\\",\\\", RowBox[{\\\"d_lif\\\", \\\" \\\", RowBox[{\\\"_\\\", \
+\\\"?\\\", \\\"NumericQ\\\"}]}]}], \\\"]\\\"}], \\\"\[RuleDelayed]\\\", \
+RowBox[{\\\"Module\\\", \\\"[\\\", RowBox[{RowBox[{\\\"{\\\", \
+RowBox[{\\\"thicknesses\\\", \\\"=\\\", RowBox[{\\\"{\\\", \
+RowBox[{\\\"d_ito\\\", \\\",\\\", \\\"d_npb\\\", \\\",\\\", \\\"d_cbp\\\", \\\
+\",\\\", \\\"d_tpbi\\\", \\\",\\\", \\\"d_lif\\\", \\\",\\\", \\\"\[Infinity]\
+\\\"}], \\\"}\\\"}]}], \\\"}\\\"}], \\\",\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\"=\\\", \\\"0.7`\\\"}], \\\";\\\", \
+RowBox[{\\\"wUniformity\\\", \\\"=\\\", \\\"0.3`\\\"}], \\\";\\\", \
+RowBox[{RowBox[{\\\"wEfficiency\\\", \\\" \\\", RowBox[{\\\"OverallEfficiency\
+\\\", \\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}], \\\"+\\\", \
+RowBox[{\\\"wUniformity\\\", \\\" \\\", RowBox[{\\\"Uniformity\\\", \
+\\\"[\\\", \\\"thicknesses\\\", \\\"]\\\"}]}]}]}]}], \\\"]\\\"}]}]\\).\"", 2, 
+   265, 37, 17792161530042188262, "Local"},
+  "MessageTemplate",
+  BaseStyle->"MSG"]], "Message",
+ CellChangeTimes->{3.962959533453947*^9},
+ CellLabel->
+  "During evaluation of \
+In[265]:=",ExpressionUUID->"d1155d0d-114c-fe40-a50f-926f255efc14"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "General", "stop", 
+   "\"Further output of \\!\\(\\*StyleBox[RowBox[{\\\"RuleDelayed\\\", \\\"::\
+\\\", \\\"rhs\\\"}], \\\"MessageName\\\"]\\) will be suppressed during this \
+calculation.\"", 2, 265, 38, 17792161530042188262, "Local"},
+  "MessageTemplate",
+  BaseStyle->"MSG"]], "Message",
+ CellChangeTimes->{3.962959533453947*^9},
+ CellLabel->
+  "During evaluation of \
+In[265]:=",ExpressionUUID->"254b2d2c-f2ee-1b4a-9258-d9c55459fee2"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"--", 
+      RowBox[{"-", "4."}]}], " ", "Perform", " ", "Multi"}], "-", 
+    RowBox[{"Objective", " ", 
+     RowBox[{"Optimization", "--"}]}], "-"}], "*)"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+    "Print", "[", "\"\<Starting optimization... This may take several \
+minutes.\>\"", "]"}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"optimizationResult", "=", 
+     RowBox[{"NMaximize", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"ObjectiveFunction", "[", 
+          RowBox[{
+          "d_ito", ",", "d_npb", ",", "d_cbp", ",", "d_tpbi", ",", "d_lif"}], 
+          "]"}], ",", 
+         RowBox[{"(*", 
+          RowBox[{
+          "Constraints", " ", "for", " ", "layer", " ", "thicknesses", " ", 
+           "in", " ", "nm"}], "*)"}], 
+         RowBox[{
+          RowBox[{"140", "<", "d_ito", "<", "160"}], "&&", 
+          RowBox[{"80", "<", "d_npb", "<", "100"}], "&&", 
+          RowBox[{"15", "<", "d_cbp", "<", "25"}], "&&", 
+          RowBox[{"35", "<", "d_tpbi", "<", "45"}], "&&", 
+          RowBox[{"0.5", "<", "d_lif", "<", "1.5"}]}]}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "d_ito", ",", "d_npb", ",", "d_cbp", ",", "d_tpbi", ",", "d_lif"}], 
+        "}"}], ",", 
+       RowBox[{"Method", "->", "\"\<DifferentialEvolution\>\""}], ",", 
+       RowBox[{"(*", 
+        RowBox[{
+        "Good", " ", "for", " ", "complex", " ", "global", " ", 
+         "optimization"}], "*)"}], 
+       RowBox[{"MaxIterations", "->", "50"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"--", 
+       RowBox[{"-", "5."}]}], " ", "Visualize", " ", "and", " ", "Report", " ", 
+      RowBox[{"Results", "--"}]}], "-"}], "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Print", "[", "\"\<\\n--- Optimization Complete ---\>\"", "]"}], 
+    ";"}], "\n", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"\"\<Maximized Objective Value: \>\"", ",", 
+      RowBox[{"optimizationResult", "[", 
+       RowBox[{"[", "1", "]"}], "]"}]}], "]"}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"Print", "[", "\"\<Optimal Thicknesses (nm):\>\"", "]"}], ";"}], "\n", 
+   RowBox[{"TableForm", "[", 
+    RowBox[{
+     RowBox[{"List", "@@@", 
+      RowBox[{"optimizationResult", "[", 
+       RowBox[{"[", "2", "]"}], "]"}]}], ",", 
+     RowBox[{"TableHeadings", "->", 
+      RowBox[{"{", 
+       RowBox[{"None", ",", 
+        RowBox[{"{", 
+         RowBox[{"\"\<Layer\>\"", ",", "\"\<Thickness (nm)\>\""}], "}"}]}], 
+       "}"}]}]}], "]"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"optimizedThicknesses", "=", 
+     RowBox[{"Values", "[", 
+      RowBox[{"optimizationResult", "[", 
+       RowBox[{"[", "2", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"finalThicknesses", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"optimizedThicknesses", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], ",", 
+       RowBox[{"optimizedThicknesses", "[", 
+        RowBox[{"[", "2", "]"}], "]"}], ",", 
+       RowBox[{"optimizedThicknesses", "[", 
+        RowBox[{"[", "3", "]"}], "]"}], ",", 
+       RowBox[{"optimizedThicknesses", "[", 
+        RowBox[{"[", "4", "]"}], "]"}], ",", 
+       RowBox[{"optimizedThicknesses", "[", 
+        RowBox[{"[", "5", "]"}], "]"}], ",", "Infinity"}], "}"}]}], ";"}], 
+   "\n", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"Final", " ", "calculated", " ", "metrics"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"finalEta", "=", 
+     RowBox[{"OverallEfficiency", "[", "finalThicknesses", "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"finalU", "=", 
+     RowBox[{"Uniformity", "[", "finalThicknesses", "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"\"\<\\nOverall Outcoupling Efficiency: \>\"", ",", 
+      RowBox[{"NumberForm", "[", 
+       RowBox[{"finalEta", ",", 
+        RowBox[{"{", 
+         RowBox[{"3", ",", "3"}], "}"}]}], "]"}]}], "]"}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"Print", "[", 
+     RowBox[{"\"\<Outcoupling Uniformity Score: \>\"", ",", 
+      RowBox[{"NumberForm", "[", 
+       RowBox[{"finalU", ",", 
+        RowBox[{"{", 
+         RowBox[{"3", ",", "3"}], "}"}]}], "]"}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Plot", " ", "the", " ", "optimized", " ", "outcoupling", " ", 
+     "efficiency", " ", "spectrum"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"etaPlot", "=", 
+     RowBox[{"Plot", "[", 
+      RowBox[{
+       RowBox[{"etaOut", "[", 
+        RowBox[{"lambda", ",", "finalThicknesses"}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"lambda", ",", "400", ",", "700"}], "}"}], ",", 
+       RowBox[{"PlotRange", "->", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "Automatic"}], "}"}]}], ",", 
+       RowBox[{"AxesLabel", "->", 
+        RowBox[{"{", 
+         RowBox[{"\"\<Wavelength (nm)\>\"", 
+          ",", "\"\<Outcoupling Efficiency\>\""}], "}"}]}], ",", 
+       RowBox[{
+       "PlotLabel", 
+        "->", "\"\<Optimized Outcoupling Efficiency Spectrum\>\""}], ",", 
+       RowBox[{"GridLines", "->", "Automatic"}], ",", 
+       RowBox[{"PlotStyle", "->", 
+        RowBox[{"{", 
+         RowBox[{"Thick", ",", "Blue"}], "}"}]}]}], "]"}]}], ";"}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Plot", " ", "the", " ", "emitter", " ", "spectrum", " ", "for", " ", 
+     "reference"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"emitterPlot", "=", 
+     RowBox[{"Plot", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Max", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"etaOut", "[", 
+            RowBox[{"#", ",", "finalThicknesses"}], "]"}], "&"}], "/@", 
+          RowBox[{"Range", "[", 
+           RowBox[{"400", ",", "700"}], "]"}]}], "]"}], "*", 
+        RowBox[{"emissionSpectrum", "[", "lambda", "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"lambda", ",", "400", ",", "700"}], "}"}], ",", 
+       RowBox[{"PlotStyle", "->", 
+        RowBox[{"{", 
+         RowBox[{"Dashed", ",", "Orange"}], "}"}]}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"Show", "[", 
+    RowBox[{"etaPlot", ",", "emitterPlot", ",", 
+     RowBox[{
+     "PlotLabel", 
+      "->", "\"\<Optimized Outcoupling (Blue) vs. Emitter Spectrum (Orange)\>\
+\""}]}], "]"}]}]}]], "Input",ExpressionUUID->"7d33c437-eb7c-0844-9e1d-\
+89debd6d3e48"]
+},
+WindowSize->{949, 557},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.2 for Microsoft Windows (64-bit) (March 14, 2025)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"9a9cb5f5-f0d1-4d41-a199-9c8850f9b475"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 6326, 189, 580, "Input",ExpressionUUID->"fce0d0d2-9770-6d4b-bc2f-7bac8693326e"],
+Cell[6883, 211, 7719, 206, 370, "Input",ExpressionUUID->"1864c96f-a1a6-5a45-a8b9-a603fc71efce"],
+Cell[14605, 419, 3464, 90, 237, "Input",ExpressionUUID->"7d298e1a-1749-254f-ae37-defc3d98a460"],
+Cell[18072, 511, 1018, 30, 66, "Input",ExpressionUUID->"2975fcb6-bb8e-cb40-9985-3e1dd57fd0f3"],
+Cell[19093, 543, 1276, 37, 161, "Input",ExpressionUUID->"55f9b0f1-1a41-d143-8dac-1302616fd32a"],
+Cell[20372, 582, 2388, 63, 218, "Input",ExpressionUUID->"0e6fc832-3730-6a4e-8fae-423706958fe8"],
+Cell[CellGroupData[{
+Cell[22785, 649, 1494, 39, 123, "Input",ExpressionUUID->"cdbe05a5-fc25-3c47-acb4-e0e610f04076"],
+Cell[24282, 690, 1765, 29, 62, "Message",ExpressionUUID->"bb5efb18-e0e3-844f-9703-524f057f30d7"],
+Cell[26050, 721, 1765, 29, 62, "Message",ExpressionUUID->"c46bc604-3a8f-7745-856b-f5c38e2f3bb8"],
+Cell[27818, 752, 1763, 29, 62, "Message",ExpressionUUID->"d1155d0d-114c-fe40-a50f-926f255efc14"],
+Cell[29584, 783, 470, 11, 26, "Message",ExpressionUUID->"254b2d2c-f2ee-1b4a-9258-d9c55459fee2"]
+}, Open  ]],
+Cell[30069, 797, 6608, 172, 732, "Input",ExpressionUUID->"7d33c437-eb7c-0844-9e1d-89debd6d3e48"]
+}
+]
+*)
+

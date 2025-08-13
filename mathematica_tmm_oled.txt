@@ -1,0 +1,204 @@
+(* Mathematica code for OLED outcoupling efficiency using TMM *)
+
+(* Physical constants *)
+c = 2.998*10^8; (* speed of light in m/s *)
+\[Epsilon]0 = 8.854*10^-12; (* vacuum permittivity *)
+
+(* OLED layer structure definition *)
+layerThicknesses = <|
+  "cathode" -> 100*10^-9, (* Al cathode in meters *)
+  "ETL" -> 30*10^-9, (* Electron transport layer *)
+  "EML" -> 20*10^-9, (* Emissive layer *)
+  "HTL" -> 40*10^-9, (* Hole transport layer *)
+  "anode" -> 150*10^-9, (* ITO anode *)
+  "substrate" -> 500*10^-6 (* Glass substrate *)
+|>;
+
+(* Complex refractive index functions *)
+aluminumIndex[\[Lambda]nm_] := Module[{wl, \[Omega]p, \[Gamma], \[Omega], \[Epsilon]inf, \[Epsilon]},
+  wl = \[Lambda]nm*10^-9; (* convert to meters *)
+  \[Omega]p = 2.24*10^16; (* plasma frequency *)
+  \[Gamma] = 1.22*10^14; (* damping frequency *)
+  \[Omega] = 2*\[Pi]*c/wl;
+  \[Epsilon]inf = 1.0;
+  \[Epsilon] = \[Epsilon]inf - \[Omega]p^2/(\[Omega]^2 + I*\[Gamma]*\[Omega]);
+  Sqrt[\[Epsilon]]
+];
+
+refractiveIndices = <|
+  "air" -> Function[\[Lambda], 1.0 + 0*I],
+  "glass" -> Function[\[Lambda], 1.52 + 0*I],
+  "ITO" -> Function[\[Lambda], 1.8 + 0.01*I],
+  "HTL" -> Function[\[Lambda], 1.7 + 0.001*I],
+  "EML" -> Function[\[Lambda], 1.8 + 0.002*I],
+  "ETL" -> Function[\[Lambda], 1.8 + 0.001*I],
+  "Al" -> aluminumIndex
+|>;
+
+(* Transfer matrix functions *)
+transferMatrixLayer[n_, thickness_, kz_, polarization_:"TE"] := Module[{},
+  If[polarization == "TE",
+    (* TE polarization *)
+    {{Cos[kz*thickness], I*Sin[kz*thickness]/kz},
+     {I*kz*Sin[kz*thickness], Cos[kz*thickness]}},
+    (* TM polarization *)
+    {{Cos[kz*thickness], I*Sin[kz*thickness]/(n^2*kz)},
+     {I*n^2*kz*Sin[kz*thickness], Cos[kz*thickness]}}
+  ]
+];
+
+interfaceMatrix[n1_, n2_, kz1_, kz2_, polarization_:"TE"] := Module[{},
+  If[polarization == "TE",
+    (* TE interface *)
+    0.5*{{1 + kz2/kz1, 1 - kz2/kz1},
+         {1 - kz2/kz1, 1 + kz2/kz1}},
+    (* TM interface *)
+    0.5*{{1 + n1^2*kz2/(n2^2*kz1), 1 - n1^2*kz2/(n2^2*kz1)},
+         {1 - n1^2*kz2/(n2^2*kz1), 1 + n1^2*kz2/(n2^2*kz1)}}
+  ]
+];
+
+(* Calculate z-component of wavevector *)
+calculateKz[n_, k0_, kParallel_] := Module[{kzSquared, kz},
+  kzSquared = (k0*n)^2 - kParallel^2;
+  kz = Sqrt[kzSquared];
+  (* Choose proper branch *)
+  If[Re[kz] < 0, kz = -kz];
+  kz
+];
+
+(* Main function to calculate total transfer matrix *)
+totalTransferMatrix[\[Lambda]nm_, kParallel_, polarization_:"TE"] := Module[{
+  k0, layers, nValues, kzValues, MTotal, MGlass, IGlass, MITO, IITO, 
+  MHTL, IHTL, MEML, IEML, METL, IETL, IAl},
+  
+  k0 = 2*\[Pi]/(\[Lambda]nm*10^-9); (* free space wavevector *)
+  
+  (* Layer order: air, glass, ITO, HTL, EML, ETL, Al *)
+  layers = {"air", "glass", "ITO", "HTL", "EML", "ETL", "Al"};
+  nValues = refractiveIndices[#][\[Lambda]nm] & /@ layers;
+  kzValues = calculateKz[#, k0, kParallel] & /@ nValues;
+  
+  (* Start with identity matrix *)
+  MTotal = IdentityMatrix[2];
+  
+  (* Glass substrate *)
+  MGlass = transferMatrixLayer[nValues[[2]], layerThicknesses["substrate"], kzValues[[2]], polarization];
+  IGlass = interfaceMatrix[nValues[[1]], nValues[[2]], kzValues[[1]], kzValues[[2]], polarization];
+  MTotal = MTotal.IGlass.MGlass;
+  
+  (* ITO anode *)
+  MITO = transferMatrixLayer[nValues[[3]], layerThicknesses["anode"], kzValues[[3]], polarization];
+  IITO = interfaceMatrix[nValues[[2]], nValues[[3]], kzValues[[2]], kzValues[[3]], polarization];
+  MTotal = MTotal.IITO.MITO;
+  
+  (* HTL *)
+  MHTL = transferMatrixLayer[nValues[[4]], layerThicknesses["HTL"], kzValues[[4]], polarization];
+  IHTL = interfaceMatrix[nValues[[3]], nValues[[4]], kzValues[[3]], kzValues[[4]], polarization];
+  MTotal = MTotal.IHTL.MHTL;
+  
+  (* EML *)
+  MEML = transferMatrixLayer[nValues[[5]], layerThicknesses["EML"], kzValues[[5]], polarization];
+  IEML = interfaceMatrix[nValues[[4]], nValues[[5]], kzValues[[4]], kzValues[[5]], polarization];
+  MTotal = MTotal.IEML.MEML;
+  
+  (* ETL *)
+  METL = transferMatrixLayer[nValues[[6]], layerThicknesses["ETL"], kzValues[[6]], polarization];
+  IETL = interfaceMatrix[nValues[[5]], nValues[[6]], kzValues[[5]], kzValues[[6]], polarization];
+  MTotal = MTotal.IETL.METL;
+  
+  (* Final interface to Al cathode *)
+  IAl = interfaceMatrix[nValues[[6]], nValues[[7]], kzValues[[6]], kzValues[[7]], polarization];
+  MTotal = MTotal.IAl;
+  
+  {MTotal, kzValues[[1]]} (* Return matrix and kz in air *)
+];
+
+(* Calculate outcoupling efficiency for given wavelength and angle *)
+outcouplingEfficiency[\[Lambda]nm_, angleDeg_] := Module[{
+  k0, nAir, kParallel, effTE, effTM, MTE, kzTE, MTM, kzTM, tTE, tTM},
+  
+  k0 = 2*\[Pi]/(\[Lambda]nm*10^-9);
+  nAir = 1.0;
+  kParallel = k0*nAir*Sin[angleDeg*\[Pi]/180];
+  
+  (* Calculate for TE polarization *)
+  {MTE, kzTE} = totalTransferMatrix[\[Lambda]nm, kParallel, "TE"];
+  If[Abs[MTE[[1,1]]] > 10^-10,
+    tTE = 1.0/MTE[[1,1]];
+    effTE = Abs[tTE]^2*Re[kzTE]/Re[k0];,
+    effTE = 0.0;
+  ];
+  
+  (* Calculate for TM polarization *)
+  {MTM, kzTM} = totalTransferMatrix[\[Lambda]nm, kParallel, "TM"];
+  If[Abs[MTM[[1,1]]] > 10^-10,
+    tTM = 1.0/MTM[[1,1]];
+    effTM = Abs[tTM]^2*Re[kzTM]/Re[k0];,
+    effTM = 0.0;
+  ];
+  
+  (* Average over polarizations *)
+  (effTE + effTM)/2
+];
+
+(* Generate efficiency data *)
+\[Lambda]Range = Range[400, 700, 10]; (* wavelength range in nm *)
+angleRange = Range[0, 85, 5]; (* angle range in degrees *)
+
+(* Calculate efficiency matrix *)
+efficiencyMatrix = Table[
+  outcouplingEfficiency[\[Lambda], angle],
+  {\[Lambda], \[Lambda]Range}, {angle, angleRange}
+];
+
+(* Create visualization *)
+plot2D = ListContourPlot[
+  Flatten[Table[{angleRange[[j]], \[Lambda]Range[[i]], efficiencyMatrix[[i,j]]}, 
+    {i, Length[\[Lambda]Range]}, {j, Length[angleRange]}], 1],
+  PlotRange -> All,
+  ColorFunction -> "Rainbow",
+  FrameLabel -> {"Angle (degrees)", "Wavelength (nm)"},
+  PlotLabel -> "OLED Outcoupling Efficiency",
+  Contours -> 15,
+  PlotLegends -> Automatic
+];
+
+(* Plot efficiency vs angle at 550nm *)
+\[Lambda]550Index = Nearest[\[Lambda]Range -> Automatic, 550][[1]];
+plotAngle = ListLinePlot[
+  Transpose[{angleRange, efficiencyMatrix[[\[Lambda]550Index]]}],
+  PlotStyle -> Blue,
+  FrameLabel -> {"Angle (degrees)", "Outcoupling Efficiency"},
+  PlotLabel -> "Efficiency vs Angle (550nm)",
+  GridLines -> Automatic
+];
+
+(* Plot efficiency vs wavelength at normal incidence *)
+plotWavelength = ListLinePlot[
+  Transpose[{\[Lambda]Range, efficiencyMatrix[[All, 1]]}],
+  PlotStyle -> Red,
+  FrameLabel -> {"Wavelength (nm)", "Outcoupling Efficiency"},
+  PlotLabel -> "Efficiency vs Wavelength (0°)",
+  GridLines -> Automatic
+];
+
+(* Display results *)
+Print["OLED Outcoupling Efficiency Analysis"];
+Print["Maximum efficiency: ", Max[efficiencyMatrix]];
+Print["Efficiency at 550nm, 0°: ", efficiencyMatrix[[\[Lambda]550Index, 1]]];
+Print["Average efficiency: ", Mean[Flatten[efficiencyMatrix]]];
+
+(* Display plots *)
+GraphicsGrid[{{plot2D}, {plotAngle, plotWavelength}}, ImageSize -> Large]
+
+(* Export data for further analysis *)
+efficiencyData = Flatten[Table[
+  {\[Lambda]Range[[i]], angleRange[[j]], efficiencyMatrix[[i,j]]},
+  {i, Length[\[Lambda]Range]}, {j, Length[angleRange]}
+], 1];
+
+Export["oled_outcoupling_data.csv", 
+  Prepend[efficiencyData, {"Wavelength_nm", "Angle_deg", "Efficiency"}]];
+
+Print["Data exported to oled_outcoupling_data.csv"];
